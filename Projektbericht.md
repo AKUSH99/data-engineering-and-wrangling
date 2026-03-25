@@ -1,7 +1,7 @@
 # Projektbericht: IMDb vs. Rotten Tomatoes – Der grosse Rating-Vergleich
 
 **Modul:** Data Engineering & Wrangling | FHNW  
-**Autoren:** Almid Kushaj, Claudio Vinci  
+**Autoren:** Almidin Bangoji, Claudio Vinci  
 **Datum:** März 2026
 
 ---
