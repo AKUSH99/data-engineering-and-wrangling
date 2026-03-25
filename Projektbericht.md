@@ -111,10 +111,104 @@ Bei Verstössen bricht die Pipeline mit einer Fehlermeldung ab (`stopifnot`).
 
 ### 3.3 Dashboard-Entwicklung
 
-Das Ergebnis wird als **Shiny Dashboard** mit 7 thematischen Tabs präsentiert. Alle Visualisierungen sind interaktiv (Hover-Tooltips, Zoom, Filter). Das Dashboard nutzt ein dunkles Farbschema (Dark Theme) mit einheitlichen Farben:
-- Gold (#F5C518) für IMDb
-- Rot (#FA320A) für RT-Kritiker
-- Blau (#4A90D9) für RT-Publikum
+Das Ergebnis wird als **Shiny Dashboard** mit **8 thematischen Tabs** präsentiert. Alle Visualisierungen sind interaktiv (Hover-Tooltips, Zoom, Filter). Das Dashboard nutzt ein durchgängiges **Dark Theme** mit einheitlicher Farbcodierung:
+
+- **Gold (#F5C518)** für IMDb-Daten
+- **Rot (#FA320A)** für RT-Kritiker-Daten
+- **Blau (#4A90D9)** für RT-Publikums-Daten
+
+Diese drei Farben ziehen sich konsistent durch alle Plots, Legenden, ValueBoxes und Tabellen, sodass die Zuordnung auf jeder Seite sofort erkennbar ist.
+
+Im Folgenden wird jeder Tab mit seinem Inhalt und Zweck beschrieben:
+
+#### Tab 1: Übersicht
+
+Der Einstiegs-Tab gibt einen **kompakten Gesamtüberblick** über den Datensatz und die wichtigsten Kennzahlen:
+
+- **4 ValueBoxes** oben: Filmanzahl (641), Pearson-Korrelation (r = 0.227), durchschnittliche Differenz (−0.908) und Selektionsbias-Hinweis ("Top 1000").
+- **Bewertungsverteilung** (Histogramm): Überlagerte Dichtekurven von IMDb-Ratings (gold) und normalisiertem Tomatometer (rot). Hier wird sofort sichtbar, dass die RT-Verteilung breiter streut und nach rechts verschoben ist.
+- **Selektionsbias-Infobox**: Erklärender Text zum eingeschränkten IMDb-Bereich (7.6–9.3), zum hohen Anteil an Certified-Fresh-Filmen und zur eingeschränkten Generalisierbarkeit.
+- **Scatterplot IMDb vs. Tomatometer**: Jeder Punkt ist ein Film. Die Diagonale zeigt, wo beide Bewertungen übereinstimmen würden – die Punktwolke liegt überwiegend darunter (RT bewertet höher).
+- **Top-5-Tabelle** (mit Tabs): Die fünf grössten Abweichungen in beide Richtungen (IMDb >> RT und RT >> IMDb), dargestellt als interaktive DT-Tabelle.
+
+#### Tab 2: Drei-Wege-Vergleich
+
+Dieser Tab erweitert die Analyse um die **dritte Bewertungsdimension** (RT-Publikum) und zeigt alle drei paarweisen Korrelationen:
+
+- **3 InfoBoxes**: Jede zeigt eine Korrelation mit dynamischem Beschreibungstext (z.B. "schwache Korrelation" für r = 0.227, generiert durch die Funktion `corr_label()`).
+- **Drei-Panel-Scatterplot**: Drei nebeneinander angeordnete Scatterplots (IMDb vs. RT-Kritiker, IMDb vs. RT-Publikum, RT-Kritiker vs. RT-Publikum) mit Trendlinien. So lassen sich die drei Beziehungen visuell direkt vergleichen.
+- **Differenz-Balkendiagramm**: Horizontale Balken zeigen die Ø Differenz zwischen den drei Bewertungspaaren. Die Balkenfarbe wechselt je nach Vorzeichen.
+- **Interpretationsbox**: Automatisch generierter Text mit den statistischen Kennzahlen (r-Werte, 95%-Konfidenzintervalle, p-Werte, t-Test-Ergebnis, Cohen's d). Dieser Text wird dynamisch aus den Pipeline-Ergebnissen zusammengebaut.
+
+#### Tab 3: Genre-Analyse
+
+Hier wird untersucht, ob die **Bewertungsunterschiede genreabhängig** sind:
+
+- **Genre-Filter** (Selectize-Input, serverseitig): Nutzer können einzelne oder mehrere Genres auswählen. Standardmässig sind alle 9 Genres mit n ≥ 5 aktiv.
+- **Grouped Bar Chart (3 Plattformen)**: Pro Genre drei nebeneinanderliegende Balken in den Plattform-Farben (Gold, Rot, Blau). Zeigt die Ø Bewertung jeder Plattform pro Genre.
+- **Horizontaler Differenz-Balken**: Zeigt die Ø Bewertungsdifferenz (IMDb − RT-Kritiker) pro Genre. Negative Werte (RT höher) sind rot, positive gelb. Animation und Comedy stechen als grösste Abweichungen hervor.
+
+#### Tab 4: Zeittrend
+
+Dieser Tab zeigt, wie sich die **Bewertungen über die Jahrzehnte** entwickelt haben:
+
+- **Liniendiagramm nach Dekade**: Zwei Linien (IMDb gold, RT-Kritiker rot) von den 1960ern bis 2010ern. Die IMDb-Ratings bleiben stabil (~7.9), während die RT-Kritiker-Bewertungen stärker schwanken (Höchstwert 9.30 in den 1970ern, Tiefpunkt 8.15 in den 2000ern).
+- **Hinweistext**: Erklärt, warum Dekaden vor 1960 ausgeblendet sind (weniger als 48 Filme, nicht repräsentativ – Survivorship-Effekt bei Klassikern).
+
+#### Tab 5: Popularität
+
+Untersucht den Zusammenhang zwischen **Bekanntheit** (IMDb-Votes) und **Bewertungsunterschied**:
+
+- **Scatterplot mit log10-Skala**: Die x-Achse zeigt log10(IMDb Votes), die y-Achse die Bewertungsdifferenz. Eine Trendlinie zeigt den Zusammenhang: Populärere Filme haben kleinere Abweichungen.
+- **Boxplot nach Vote-Bucket**: Vier Kategorien (<100k, 100k–500k, 500k–1M, >1M Votes) als Boxplot. Visualisiert Median und Streuung der Bewertungsdifferenz pro Kategorie.
+- **Statistik-Tabelle**: DT-Tabelle mit den aggregierten Kennzahlen pro Vote-Bucket (Ø IMDb, Ø Differenz, Filmanzahl).
+
+#### Tab 6: Zuverlässigkeit
+
+Prüft, ob die **Anzahl der Kritikerbesprechungen** die Bewertung beeinflusst:
+
+- **3 ValueBoxes**: Median der Kritikanzahl (89), Anzahl Filme mit < 20 Kritiken (9) und Anteil Certified-Fresh-Filme (82.8%).
+- **Scatterplot Kritikanzahl vs. Tomatometer**: Zeigt die Streuung des Tomatometer-Ratings in Abhängigkeit von der Kritikanzahl. Bei wenigen Kritiken ist die Streuung erwartungsgemäss grösser.
+- **Scatterplot Kritikanzahl vs. |Differenz|**: Zeigt, ob Filme mit wenigen Kritiken grössere Abweichungen zum IMDb-Rating aufweisen.
+- **Boxplot nach Tomatometer-Status**: Vergleicht die IMDb-Ratings zwischen Certified-Fresh, Fresh und Rotten Filmen. Die 13 "Rotten"-Filme zeigen besonders hohe IMDb-Ratings (typische Publikumslieblinge).
+- **Low-Critics-Tabelle**: DT-Tabelle der 9 Filme mit weniger als 20 Kritikerbesprechungen (als potenziell unzuverlässig geflaggt).
+
+#### Tab 7: Datenqualität
+
+Dieser Tab wurde als **eigene Qualitätssicherungs-Seite** hinzugefügt und macht die Datenqualität transparent:
+
+- **4 ValueBoxes**: Gesamtzahl fehlender Werte, Duplikate, Match-Typen (exakt/fuzzy) und Anzahl unzuverlässiger Einträge (< 20 Kritiken).
+- **Datenqualitäts-Kennzahlen** (DT-Tabelle): Überblick über automatische QA-Prüfungen (z.B. Wertebereiche, Vollständigkeit).
+- **Fehlende Werte je Kernvariable** (Balkendiagramm): Zeigt pro Variable (IMDB_Rating, tomatometer_normalized, audience_normalized etc.) die Anzahl fehlender Werte. Validiert, dass der gemergte Datensatz vollständig ist.
+- **Matching-Qualität** (Balkendiagramm): Visualisiert das Verhältnis von exakten Matches (618) zu Fuzzy Matches (23). Macht die Zusammensetzung des Datensatzes transparent.
+- **Fehlende-Werte-Tabelle**: Detaillierte Aufschlüsselung als DT-Tabelle.
+
+#### Tab 8: Datentabelle
+
+Der letzte Tab bietet den **vollständigen gemergten Datensatz** als interaktive DT-Tabelle:
+
+- **641 Zeilen** mit allen berechneten Variablen (Titel, Jahr, Genre, IMDb-Rating, Tomatometer, Audience Score, Differenz, Votes, Kritikanzahl, Tomatometer-Status, Match-Typ etc.).
+- **Spaltenweise Filter und Suche**: Nutzer können nach Filmtitel suchen, nach Genre filtern oder nach Bewertungsdifferenz sortieren.
+- **Match-Typ-Spalte**: Zeigt für jeden Film an, ob er per exaktem Join oder Fuzzy Matching zugeordnet wurde – ein transparenter Einblick in die Datenqualität.
+
+### 3.4 Code-Architektur und Qualitätssicherung
+
+Um Konsistenz und Wartbarkeit sicherzustellen, wurden folgende **Software-Engineering-Praktiken** angewandt:
+
+1. **Zentrale Farbkonstanten** (`COLORS`-Liste): Alle Farben werden an einer Stelle definiert und im gesamten Code referenziert. Änderungen am Farbschema erfordern nur eine Anpassung.
+
+2. **Wiederverwendbare Helferfunktionen**:
+   - `theme_dashboard()`: Einheitliches ggplot2-Theme (Hintergrund, Schriftfarben, Gitterlinien) für alle Plots.
+   - `plotly_dark_layout()`: Einheitliches Plotly-Layout (Hintergrund, Schriftfarbe, Toolbar-Konfiguration) für alle interaktiven Grafiken.
+   - `corr_label()`: Dynamische Texterzeugung basierend auf dem Korrelationskoeffizienten (z.B. r = 0.22 → "schwache Korrelation").
+
+3. **Robuste Fehlerbehandlung**: Die Pipeline wird in einen `tryCatch`-Block eingebettet, sodass bei Ladefehlern eine verständliche Fehlermeldung erscheint statt eines kryptischen R-Stacktraces.
+
+4. **Serverseitiges Selectize-Input**: Der Genre-Filter nutzt `server = TRUE`, um bei vielen Optionen die UI-Performance zu erhalten.
+
+5. **Trennung von Logik und Darstellung**: Die Daten-Pipeline (`pipeline.R`) ist komplett vom Dashboard (`app.R`) getrennt. Die Pipeline kann unabhängig ausgeführt und getestet werden; das Dashboard empfängt nur das fertige Ergebnis.
+
+6. **Durchgängiges CSS-Dark-Theme**: Über 100 Zeilen Custom-CSS stellen sicher, dass alle Komponenten (Sidebar, Boxen, Tabellen, DT, Selectize-Inputs, Plotly-Toolbar) im dunklen Farbschema konsistent dargestellt werden.
 
 ---
 
@@ -296,8 +390,8 @@ Die Pipeline gibt bei jedem Start detaillierte Statusmeldungen aus:
 
 | Datei | Zweck | Zeilen |
 |-------|-------|--------|
-| `pipeline.R` | 5-Schritt-Daten-Pipeline (inkl. Fuzzy Matching + Inferenzstatistik) | ~320 |
-| `app.R` | Shiny Dashboard (UI + Server) | ~700 |
+| `pipeline.R` | 5-Schritt-Daten-Pipeline (inkl. Fuzzy Matching + Inferenzstatistik) | ~350 |
+| `app.R` | Shiny Dashboard (8 Tabs, UI + Server, Custom CSS) | ~1'250 |
 | `install_packages.R` | Einmalige Package-Installation | ~35 |
 | `versions.txt` | Package-Versionen für Reproduzierbarkeit | – |
 | `imdb_top_1000.csv` | IMDb-Rohdaten | 1'000 |
