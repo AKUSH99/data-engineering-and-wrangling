@@ -259,6 +259,8 @@ Das heisst: RT-Kritiker bewerten die gleichen Filme im Schnitt fast einen ganzen
 
 Auffällig: Filme, bei denen das Publikum die Kritiker übertrifft (bis +5.0), zeigen grössere Extremwerte als umgekehrt (maximal −2.3). Dies liegt am Selektionsbias: IMDb-Ratings starten bei 7.6, sodass der maximale negative Ausschlag begrenzt ist.
 
+**Skalenasymmetrie:** Ein oft übersehener Befund zeigt sich in der Streubreite beider Skalen. Die IMDb-Ratings im Datensatz umfassen nur **1.7 Punkte** (7.6–9.3), der normalisierte Tomatometer dagegen **7.4 Punkte** (2.6–10.0). Kritiker differenzieren also rund **4× stärker** zwischen den gleichen Top-Filmen als das IMDb-Publikum. Dies deutet darauf hin, dass Kritiker ein breiteres Bewertungsspektrum nutzen, während das Publikum bei Top-Filmen zur Mitte tendiert (Ceiling-Effekt).
+
 ### 4.4 Genre-Analyse
 
 9 Genres haben mindestens 5 Filme im Datensatz:
@@ -290,6 +292,8 @@ Auffällig: Filme, bei denen das Publikum die Kritiker übertrifft (bis +5.0), z
 
 **Insight:** Die IMDb-Ratings bleiben über die Jahrzehnte relativ stabil (~7.9). Die Kritikerbewertungen zeigen dagegen mehr Variation: In den 1970ern erreichen sie den Höchstwert (9.30), fallen dann in den 2000ern auf 8.15 und steigen in den 2010ern wieder auf 8.88. Ältere Filme werden von Kritikern tendenziell höher bewertet – möglicherweise ein Survivorship-Effekt: Nur Klassiker überdauern.
 
+**Filmhistorischer Kontext:** Der Kritiker-Peak in den 1970ern (9.30) fällt mit der **New-Hollywood-Ära** zusammen – der Schaffensperiode von Coppola (*The Godfather*), Scorsese (*Taxi Driver*), Spielberg (*Jaws*) und Kubrick (*A Clockwork Orange*). Diese Regisseure revolutionierten das Kino mit auteur-getriebenen Erzählformen, die von Kritikern besonders gewürdigt wurden. Der Rückgang in den 2000ern (8.15) könnte die zunehmende Franchise-Dominanz widerspiegeln, bei der Kritiker zurückhaltender bewerten als das Blockbuster-affine Publikum.
+
 Dekaden vor den 1960ern wurden ausgeblendet (weniger als 48 Filme), da einzelne Klassiker wie Chaplin oder Metropolis nicht repräsentativ für ihre Epoche sind.
 
 ### 4.6 Popularitätsanalyse
@@ -319,15 +323,19 @@ Die Tomatometer-Status-Analyse zeigt:
 
 **Insight:** Die 13 "Rotten"-Filme zeigen eine extreme Diskrepanz: Vom IMDb-Publikum mit 7.66 bewertet (Top-1000-würdig), aber von Kritikern als schlecht eingestuft. Dies sind typische "Publikumslieblinge", die bei Kritikern durchfallen (z.B. The Boondock Saints).
 
+**Certified-Fresh-Paradox:** Kontraintuitiv ist, dass **Certified-Fresh-Filme eine grössere Diskrepanz** (−1.12) aufweisen als "nur" Fresh-Filme (−0.34). Man würde erwarten, dass bei den laut Kritikern besten Filmen Publikum und Kritiker am ehesten übereinstimmen – doch das Gegenteil ist der Fall. Kritiker vergeben bei Certified-Fresh-Filmen noch höhere Scores, während das IMDb-Publikum auch diese Filme im relativ engen Bereich um 7.96 bewertet. Die Erklärung liegt in der Skalenasymmetrie (vgl. 4.3): Der IMDb-Ceiling-Effekt begrenzt die Publikumsbewertung nach oben, während die Kritiker ihr volles Spektrum ausschöpfen.
+
 ---
 
 ## 5. Diskussion
 
 ### 5.1 Interpretation der Ergebnisse
 
-Die Analyse bestätigt die Hypothese, dass **Publikum und Kritiker Filme unterschiedlich bewerten**. Die schwache Korrelation (r = 0.222) zwischen IMDb und RT-Kritikern zeigt, dass professionelle Filmkritik anderen Massstäben folgt als die kollektive Publikumsmeinung.
+Die Analyse bestätigt die Hypothese, dass **Publikum und Kritiker Filme unterschiedlich bewerten**. Die schwache Korrelation (r = 0.227) zwischen IMDb und RT-Kritikern zeigt, dass professionelle Filmkritik anderen Massstäben folgt als die kollektive Publikumsmeinung.
 
-Gleichzeitig zeigt die moderate Korrelation (r = 0.541) zwischen den Publikumsbewertungen beider Plattformen, dass die "Stimme des Publikums" **plattformübergreifend konsistent** ist. Egal ob auf IMDb oder Rotten Tomatoes – Zuschauer bewerten ähnlich.
+Gleichzeitig zeigt die moderate Korrelation (r = 0.489) zwischen den Publikumsbewertungen beider Plattformen, dass die "Stimme des Publikums" **plattformübergreifend konsistent** ist. Egal ob auf IMDb oder Rotten Tomatoes – Zuschauer bewerten ähnlich.
+
+Besonders aufschlussreich ist die entdeckte **Skalenasymmetrie**: Kritiker differenzieren 4× stärker zwischen Filmen als das Publikum (7.4 vs. 1.7 Punkte Spread). Dies führt zum Certified-Fresh-Paradox (vgl. 4.7) und erklärt, warum die Korrelation zwischen Publikum und Kritikern strukturell niedrig ausfallen muss – selbst wenn beide Gruppen dieselbe Rangfolge der Filme teilen würden.
 
 ### 5.2 Limitationen
 
