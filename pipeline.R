@@ -8,6 +8,7 @@ library(readr)
 library(dplyr)
 library(tidyr)
 library(stringr)
+library(stringdist)
 
 # ==========================================
 # SCHRITT 1: DATEN EINLESEN
@@ -96,8 +97,10 @@ clean_data <- function(raw) {
 # - Tomatometer (0-100) wird auf 0-10 normalisiert (÷10) für direkten
 #   Vergleich mit IMDb-Skala. Ohne Normalisierung sind Differenzberechnungen
 #   nicht aussagekräftig.
-# - Inner Join über (normalisierter Titel + Jahr): nur Filme mit Ratings
-#   auf beiden Plattformen werden analysiert.
+# - Zwei-Stufen-Matching:
+#   1. Exakter Join über (normalisierter Titel + Jahr)
+#   2. Fuzzy Matching (Jaro-Winkler, Schwelle 0.12) für nicht-gematchte Filme
+#      mit gleichem Erscheinungsjahr → fängt Tippfehler und Titelvariation ab
 # - Neue Variablen: rating_diff, primary_genre, decade, low_critic_count
 
 transform_data <- function(clean) {
@@ -108,27 +111,68 @@ transform_data <- function(clean) {
       audience_normalized    = audience_rating    / 10
     )
 
-  df_merged <- inner_join(
-    clean$imdb,
-    df_rt_t %>% select(Title_clean, release_year, tomatometer_normalized,
-                       audience_normalized, tomatometer_rating,
-                       tomatometer_count, tomatometer_status),
+  rt_cols <- df_rt_t %>%
+    select(Title_clean, release_year, tomatometer_normalized,
+           audience_normalized, tomatometer_rating,
+           tomatometer_count, tomatometer_status)
+
+  # --- Stufe 1: Exakter Join ---
+  df_exact <- inner_join(
+    clean$imdb, rt_cols,
     by = c("Title_clean", "Released_Year" = "release_year")
-  ) %>%
-  mutate(
-    rating_diff      = IMDB_Rating - tomatometer_normalized,
-    abs_diff         = abs(rating_diff),
-    primary_genre    = str_trim(str_split_fixed(Genre, ",", 2)[,1]),
-    decade           = (Released_Year %/% 10) * 10,
-    low_critic_count = tomatometer_count < 20,
-    vote_bucket      = cut(No_of_Votes,
-                           breaks = c(0, 100000, 500000, 1000000, 5000000),
-                           labels = c("<100k", "100k–500k", "500k–1M", ">1M"),
-                           include.lowest = TRUE)
   )
 
+  # --- Stufe 2: Fuzzy Matching für nicht-gematchte ---
+  imdb_unmatched <- clean$imdb %>%
+    filter(!Title_clean %in% df_exact$Title_clean)
+
+  fuzzy_matches <- NULL
+  if (nrow(imdb_unmatched) > 0) {
+    fuzzy_rows <- list()
+    for (i in seq_len(nrow(imdb_unmatched))) {
+      row <- imdb_unmatched[i, ]
+      candidates <- rt_cols %>% filter(release_year == row$Released_Year)
+      if (nrow(candidates) == 0) next
+      dists <- stringdist::stringdist(row$Title_clean, candidates$Title_clean,
+                                       method = "jw")
+      best_idx <- which.min(dists)
+      if (dists[best_idx] < 0.12) {
+        fuzzy_rows[[length(fuzzy_rows) + 1]] <- bind_cols(
+          row %>% select(-Title_clean),
+          candidates[best_idx, ] %>% select(-Title_clean, -release_year)
+        )
+      }
+    }
+    if (length(fuzzy_rows) > 0) {
+      fuzzy_matches <- bind_rows(fuzzy_rows)
+    }
+  }
+
+  # --- Zusammenführen ---
+  if (!is.null(fuzzy_matches)) {
+    df_merged <- bind_rows(df_exact, fuzzy_matches)
+  } else {
+    df_merged <- df_exact
+  }
+  n_fuzzy <- nrow(df_merged) - nrow(df_exact)
+
+  df_merged <- df_merged %>%
+    mutate(
+      rating_diff      = IMDB_Rating - tomatometer_normalized,
+      abs_diff         = abs(rating_diff),
+      primary_genre    = str_trim(str_split_fixed(Genre, ",", 2)[,1]),
+      decade           = (Released_Year %/% 10) * 10,
+      low_critic_count = tomatometer_count < 20,
+      vote_bucket      = cut(No_of_Votes,
+                             breaks = c(0, 100000, 500000, 1000000, 5000000),
+                             labels = c("<100k", "100k–500k", "500k–1M", ">1M"),
+                             include.lowest = TRUE)
+    )
+
   message(sprintf("[3] NACH DATENTRANSFORMATION"))
-  message(sprintf("    Gematchte Filme (Inner Join): %d", nrow(df_merged)))
+  message(sprintf("    Gematchte Filme (exakt):       %d", nrow(df_exact)))
+  message(sprintf("    Gematchte Filme (fuzzy):       %d", n_fuzzy))
+  message(sprintf("    Gematchte Filme (gesamt):      %d", nrow(df_merged)))
   message(sprintf("    Ø IMDb Rating:                %.3f", mean(df_merged$IMDB_Rating)))
   message(sprintf("    Ø Tomatometer (normalisiert): %.3f",
                   mean(df_merged$tomatometer_normalized)))
@@ -183,10 +227,20 @@ quality_check <- function(df) {
 
 compute_stats <- function(df) {
 
-  # Korrelationen
-  corr_critics  <- cor(df$IMDB_Rating, df$tomatometer_normalized, use = "complete.obs")
-  corr_audience <- cor(df$IMDB_Rating, df$audience_normalized,    use = "complete.obs")
-  corr_cross    <- cor(df$tomatometer_normalized, df$audience_normalized, use = "complete.obs")
+  # Korrelationen mit Konfidenzintervallen
+  ct_critics  <- cor.test(df$IMDB_Rating, df$tomatometer_normalized)
+  ct_audience <- cor.test(df$IMDB_Rating, df$audience_normalized)
+  ct_cross    <- cor.test(df$tomatometer_normalized, df$audience_normalized)
+
+  corr_critics  <- ct_critics$estimate
+  corr_audience <- ct_audience$estimate
+  corr_cross    <- ct_cross$estimate
+
+  # t-Test: Ist die mittlere Differenz (IMDb − RT) signifikant ≠ 0?
+  ttest_diff <- t.test(df$rating_diff, mu = 0)
+
+  # Effektstärke (Cohen's d)
+  cohens_d <- mean(df$rating_diff) / sd(df$rating_diff)
 
   # Genre-Aggregation (n >= 5)
   genre_stats <- df %>%
@@ -244,15 +298,27 @@ compute_stats <- function(df) {
     select(Series_Title, Released_Year, IMDB_Rating, tomatometer_normalized, rating_diff)
 
   message(sprintf("[5] ANALYSE-ERGEBNISSE"))
-  message(sprintf("    r(IMDb, RT-Kritiker):  %.3f", corr_critics))
-  message(sprintf("    r(IMDb, RT-Publikum):  %.3f  <- deutlich stärker!", corr_audience))
-  message(sprintf("    r(Kritiker, Publikum): %.3f", corr_cross))
-  message(sprintf("    Ø Differenz (IMDb-RT): %.3f", mean(df$rating_diff)))
+  message(sprintf("    r(IMDb, RT-Kritiker):  %.3f  [95%% KI: %.3f – %.3f], p = %.2e",
+                  corr_critics, ct_critics$conf.int[1], ct_critics$conf.int[2], ct_critics$p.value))
+  message(sprintf("    r(IMDb, RT-Publikum):  %.3f  [95%% KI: %.3f – %.3f], p = %.2e  <- deutlich stärker!",
+                  corr_audience, ct_audience$conf.int[1], ct_audience$conf.int[2], ct_audience$p.value))
+  message(sprintf("    r(Kritiker, Publikum): %.3f  [95%% KI: %.3f – %.3f], p = %.2e",
+                  corr_cross, ct_cross$conf.int[1], ct_cross$conf.int[2], ct_cross$p.value))
+  message(sprintf("    Ø Differenz (IMDb-RT): %.3f  (t = %.2f, p = %.2e, Cohen's d = %.2f)",
+                  mean(df$rating_diff), ttest_diff$statistic, ttest_diff$p.value, cohens_d))
 
   list(
     corr_critics  = corr_critics,
     corr_audience = corr_audience,
     corr_cross    = corr_cross,
+    ci_critics    = ct_critics$conf.int,
+    ci_audience   = ct_audience$conf.int,
+    ci_cross      = ct_cross$conf.int,
+    p_critics     = ct_critics$p.value,
+    p_audience    = ct_audience$p.value,
+    p_cross       = ct_cross$p.value,
+    ttest_diff    = ttest_diff,
+    cohens_d      = cohens_d,
     genre_stats   = genre_stats,
     decade_stats  = decade_stats,
     vote_stats    = vote_stats,

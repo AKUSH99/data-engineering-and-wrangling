@@ -12,6 +12,7 @@ packages <- c(
   "readr",
   "tidyr",
   "stringr",
+  "stringdist",
   "scales",
   "DT",
   "plotly",

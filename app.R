@@ -349,15 +349,26 @@ server <- function(input, output, session) {
             subtitle = "mittlere Korrelation")
   })
 
-  # --- DYNAMISCHER INTERPRETATION-TEXT (ersetzt hardcoded r-Werte) ---
+  # --- DYNAMISCHER INTERPRETATION-TEXT (mit Konfidenzintervallen und p-Werten) ---
   output$interpretation_text <- renderUI({
+    p_fmt <- function(p) if (p < 0.001) "< 0.001" else sprintf("%.3f", p)
+    ci_fmt <- function(ci) sprintf("[%.3f, %.3f]", ci[1], ci[2])
+
     tags$div(style = "color: #ccc; font-size: 13px; line-height: 1.8;",
       tags$p(tags$b(style="color:#4A90D9", paste0("r = ", round(stats$corr_audience, 3))),
+        sprintf(" %s, p %s", ci_fmt(stats$ci_audience), p_fmt(stats$p_audience)),
         " — IMDb-Publikum und RT-Publikum stimmen deutlich überein."),
       tags$p(tags$b(style="color:#FA320A", paste0("r = ", round(stats$corr_critics, 3))),
+        sprintf(" %s, p %s", ci_fmt(stats$ci_critics), p_fmt(stats$p_critics)),
         " — IMDb-Publikum und RT-Kritiker weichen stark ab."),
       tags$p(tags$b(style="color:#F5C518", paste0("r = ", round(stats$corr_cross, 3))),
+        sprintf(" %s, p %s", ci_fmt(stats$ci_cross), p_fmt(stats$p_cross)),
         " — RT-Kritiker und RT-Publikum sind ebenfalls mässig korreliert."),
+      tags$hr(style="border-color:#444"),
+      tags$p(style="font-size: 12px; color: #aaa;",
+        sprintf("t-Test (H0: Ø Differenz = 0): t = %.2f, p %s, Cohen's d = %.2f",
+                stats$ttest_diff$statistic, p_fmt(stats$ttest_diff$p.value), stats$cohens_d),
+        " — Die Differenz ist statistisch signifikant."),
       tags$hr(style="border-color:#444"),
       tags$p("Fazit: ", tags$b("Publikumsmeinungen"),
         " konvergieren plattformübergreifend. ",

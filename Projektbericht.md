@@ -1,14 +1,14 @@
 # Projektbericht: IMDb vs. Rotten Tomatoes – Der grosse Rating-Vergleich
 
 **Modul:** Data Engineering & Wrangling | FHNW  
-**Autoren:** Almid Kushaj, Claudio Vinci  
+**Autoren:** Almidin Bangoji, Claudio Vinci  
 **Datum:** März 2026
 
 ---
 
 ## Abstract
 
-Diese Arbeit untersucht die Bewertungsunterschiede zwischen **IMDb** (Publikumsbewertungen) und **Rotten Tomatoes** (Kritiker- und Publikumsbewertungen). Aus 1'000 IMDb-Top-Filmen und 17'712 Rotten-Tomatoes-Einträgen wurden durch einen Inner Join 618 gemeinsame Filme identifiziert. Die Analyse zeigt, dass die Publikumsmeinungen beider Plattformen deutlich stärker übereinstimmen (r = 0.541) als die Bewertungen von IMDb-Publikum und RT-Kritikern (r = 0.222). Kritiker bewerten die gleichen Filme im Schnitt 0.9 Punkte höher als das IMDb-Publikum. Diese Ergebnisse gelten spezifisch für den Bereich der Top-bewerteten Filme und sind durch den Selektionsbias des IMDb-Datensatzes eingeschränkt.
+Diese Arbeit untersucht die Bewertungsunterschiede zwischen **IMDb** (Publikumsbewertungen) und **Rotten Tomatoes** (Kritiker- und Publikumsbewertungen). Aus 1'000 IMDb-Top-Filmen und 17'712 Rotten-Tomatoes-Einträgen wurden durch einen exakten Join (618 Filme) und anschliessendes Fuzzy Matching mit Jaro-Winkler-Distanz (23 weitere Filme) insgesamt **641 gemeinsame Filme** identifiziert. Die Analyse zeigt, dass die Publikumsmeinungen beider Plattformen deutlich stärker übereinstimmen (r = 0.489, 95% KI [0.427, 0.545]) als die Bewertungen von IMDb-Publikum und RT-Kritikern (r = 0.227, 95% KI [0.152, 0.299]). Kritiker bewerten die gleichen Filme im Schnitt 0.9 Punkte höher als das IMDb-Publikum – ein statistisch hochsignifikanter Unterschied (t = −22.06, p < 0.001, Cohen's d = −0.87). Diese Ergebnisse gelten spezifisch für den Bereich der Top-bewerteten Filme und sind durch den Selektionsbias des IMDb-Datensatzes eingeschränkt.
 
 ---
 
@@ -52,6 +52,7 @@ Ein zentraler Punkt ist der **Selektionsbias**: Der IMDb-Datensatz enthält nur 
 
 - **R 4.5** als Programmiersprache
 - **tidyverse** (dplyr, readr, tidyr, stringr) für Datenmanipulation
+- **stringdist** für Fuzzy Matching (Jaro-Winkler-Distanz)
 - **Shiny + shinydashboard** für das interaktive Web-Dashboard
 - **plotly + ggplot2** für interaktive Visualisierungen
 - **DT** für filterbare Datentabellen
@@ -75,7 +76,9 @@ Die zwei CSV-Dateien werden mit `readr::read_csv()` eingelesen. Bevor die Dateie
 #### Schritt 3: Transformation & Merge
 
 - **Skalen-Normalisierung:** Der Tomatometer (0–100) und Audience Score (0–100) werden durch 10 dividiert, um sie auf die IMDb-Skala (0–10) zu bringen. Ohne diesen Schritt wären Differenzberechnungen nicht sinnvoll.
-- **Inner Join:** Die Datensätze werden über normalisierten Titel + Erscheinungsjahr zusammengeführt. Nur Filme, die auf beiden Plattformen existieren, bleiben erhalten.
+- **Zwei-Stufen-Matching:**
+  1. **Exakter Join** über normalisierten Titel + Erscheinungsjahr → 618 Treffer
+  2. **Fuzzy Matching** (Jaro-Winkler-Distanz, Schwelle < 0.12) für nicht-gematchte Filme mit gleichem Erscheinungsjahr → 23 zusätzliche Treffer. Damit werden Titelabweichungen wie Tippfehler, Sonderzeichen oder Untertitel-Varianten aufgefangen.
 - **Abgeleitete Variablen:**
   - `rating_diff` = IMDb-Rating − Tomatometer (normalisiert)
   - `primary_genre` = Erstes Genre jedes Films
@@ -83,7 +86,7 @@ Die zwei CSV-Dateien werden mit `readr::read_csv()` eingelesen. Bevor die Dateie
   - `vote_bucket` = Kategorisierung nach Stimmenzahl (<100k, 100k–500k, 500k–1M, >1M)
   - `low_critic_count` = Flag für Filme mit weniger als 20 Kritikerbesprechungen
 
-**Ergebnis:** 618 gematchte Filme
+**Ergebnis:** 641 gematchte Filme (618 exakt + 23 fuzzy)
 
 #### Schritt 4: Qualitätsprüfung
 
@@ -98,7 +101,8 @@ Bei Verstössen bricht die Pipeline mit einer Fehlermeldung ab (`stopifnot`).
 
 #### Schritt 5: Statistiken berechnen
 
-- Pearson-Korrelationen zwischen allen drei Bewertungsdimensionen
+- Pearson-Korrelationen zwischen allen drei Bewertungsdimensionen **mit 95%-Konfidenzintervallen** (`cor.test()`)
+- **Einstichproben-t-Test** (H₀: Ø Differenz = 0) mit Effektstärke (Cohen's d)
 - Genre-Aggregation (nur Genres mit n ≥ 5 Filmen)
 - Dekaden-Aggregation (nur Dekaden mit n ≥ 48 Filmen – dem Wert der kleinsten repräsentativen Dekade)
 - Vote-Bucket-Aggregation
@@ -118,17 +122,24 @@ Das Ergebnis wird als **Shiny Dashboard** mit 7 thematischen Tabs präsentiert. 
 
 ### 4.1 Korrelationsanalyse (Kernbefund)
 
-| Vergleich | Pearson r | Interpretation |
-|-----------|-----------|----------------|
-| IMDb (Publikum) vs. RT-Kritiker | **0.222** | Schwache Korrelation |
-| IMDb (Publikum) vs. RT-Publikum | **0.541** | Moderate bis starke Korrelation |
-| RT-Kritiker vs. RT-Publikum | **0.333** | Schwache bis moderate Korrelation |
+| Vergleich | Pearson r | 95% KI | p-Wert | Interpretation |
+|-----------|-----------|--------|--------|----------------|
+| IMDb (Publikum) vs. RT-Kritiker | **0.227** | [0.152, 0.299] | 6.0 × 10⁻⁹ | Schwache Korrelation |
+| IMDb (Publikum) vs. RT-Publikum | **0.489** | [0.427, 0.545] | 9.3 × 10⁻⁴⁰ | Moderate Korrelation |
+| RT-Kritiker vs. RT-Publikum | **0.370** | [0.302, 0.435] | 2.8 × 10⁻²² | Schwache bis moderate Korrelation |
 
-**Zentrales Ergebnis:** Die Publikumsmeinungen auf IMDb und Rotten Tomatoes stimmen deutlich stärker überein (r = 0.541) als die Bewertungen zwischen Publikum und Kritikern (r = 0.222). Kritiker und Publikum bewerten Filme offenbar nach unterschiedlichen Massstäben.
+Alle drei Korrelationen sind statistisch hochsignifikant (p < 0.001). Die Konfidenzintervalle überlappen nicht zwischen IMDb-vs-RT-Kritiker und IMDb-vs-RT-Publikum, was den Unterschied bestätigt.
+
+**Zentrales Ergebnis:** Die Publikumsmeinungen auf IMDb und Rotten Tomatoes stimmen deutlich stärker überein (r = 0.489) als die Bewertungen zwischen Publikum und Kritikern (r = 0.227). Kritiker und Publikum bewerten Filme offenbar nach unterschiedlichen Massstäben.
 
 ### 4.2 Systematische Abweichung
 
-Die durchschnittliche Differenz (IMDb − Tomatometer normalisiert) beträgt **−0.913 Punkte**. Das heisst: RT-Kritiker bewerten die gleichen Filme im Schnitt fast einen ganzen Punkt höher als das IMDb-Publikum. Bei einem Datensatz aus ausschliesslich Top-bewerteten Filmen bewerten die Kritiker also noch positiver als das Publikum.
+Die durchschnittliche Differenz (IMDb − Tomatometer normalisiert) beträgt **−0.908 Punkte**.
+
+- **t-Test** (H₀: Ø Differenz = 0): t(640) = −22.06, **p < 0.001**
+- **Effektstärke:** Cohen's d = −0.87 (grosser Effekt nach Cohen's Konvention: |d| ≥ 0.8)
+
+Das heisst: RT-Kritiker bewerten die gleichen Filme im Schnitt fast einen ganzen Punkt höher als das IMDb-Publikum – und dieser Unterschied ist nicht zufällig. Bei einem Datensatz aus ausschliesslich Top-bewerteten Filmen bewerten die Kritiker also noch positiver als das Publikum.
 
 ### 4.3 Grösste Abweichungen
 
@@ -228,7 +239,7 @@ Gleichzeitig zeigt die moderate Korrelation (r = 0.541) zwischen den Publikumsbe
 
 1. **Selektionsbias:** Der IMDb-Datensatz enthält nur die Top 1'000 Filme (Ratings 7.6–9.3). Die Ergebnisse sind nicht auf durchschnittliche oder schlecht bewertete Filme übertragbar.
 
-2. **Matching-Verlust:** Von 1'000 IMDb-Filmen konnten nur 618 mit RT-Einträgen gematcht werden. Das Matching basiert auf exakter Titel+Jahr-Übereinstimmung – bei alternativen Titeln oder Tippfehlern geht der Match verloren. Fuzzy Matching könnte die Trefferquote verbessern.
+2. **Matching-Verlust:** Von 1'000 IMDb-Filmen konnten 641 mit RT-Einträgen gematcht werden (618 exakt + 23 per Fuzzy Matching). Es bleiben ~358 Filme ohne Match, vermutlich weil sie auf Rotten Tomatoes unter einem anderen Titel oder gar nicht gelistet sind.
 
 3. **Genre-Vereinfachung:** Es wird nur das erste Genre pro Film genutzt. Filme mit mehreren Genres (z.B. "Action, Sci-Fi") werden nur dem ersten zugeordnet.
 
@@ -236,20 +247,20 @@ Gleichzeitig zeigt die moderate Korrelation (r = 0.541) zwischen den Publikumsbe
 
 ### 5.3 Mögliche Erweiterungen
 
-- Fuzzy Matching (z.B. mit `stringdist`) für eine höhere Match-Rate
 - Sentimentanalyse von Review-Texten
 - Vergleich mit weiteren Plattformen (Metacritic, Letterboxd)
 - Zeitreihenanalyse: Wie verändern sich Ratings eines Films über die Jahre?
+- Regressionsanalyse: Welche Variablen (Genre, Dekade, Votes) erklären die Bewertungsdifferenz?
 
 ---
 
 ## 6. Fazit
 
-Unsere Analyse von 618 Filmen zeigt drei zentrale Erkenntnisse:
+Unsere Analyse von 641 Filmen zeigt drei zentrale Erkenntnisse:
 
-1. **Publikum ist sich einig:** IMDb- und RT-Publikumsbewertungen korrelieren mit r = 0.541 – die "Stimme des Publikums" ist plattformübergreifend konsistent.
+1. **Publikum ist sich einig:** IMDb- und RT-Publikumsbewertungen korrelieren mit r = 0.489 (95% KI [0.427, 0.545]) – die "Stimme des Publikums" ist plattformübergreifend konsistent.
 
-2. **Kritiker weichen ab:** Die Korrelation zwischen IMDb-Publikum und RT-Kritikern ist mit r = 0.222 schwach. Kritiker bewerten die gleichen Top-Filme im Schnitt 0.9 Punkte höher.
+2. **Kritiker weichen ab:** Die Korrelation zwischen IMDb-Publikum und RT-Kritikern ist mit r = 0.227 schwach. Kritiker bewerten die gleichen Top-Filme im Schnitt 0.9 Punkte höher (t = −22.06, p < 0.001, Cohen's d = −0.87).
 
 3. **Genre und Popularität spielen eine Rolle:** Animation und Comedy zeigen die grössten Abweichungen. Hochpopuläre Filme (>1M Votes) haben fast keine Lücke zwischen Publikum und Kritikern.
 
@@ -273,9 +284,9 @@ Die Pipeline gibt bei jedem Start detaillierte Statusmeldungen aus:
 ```
 [1] DATEN EINGELESEN – IMDb: 1000 Zeilen | RT: 17712 Zeilen
 [2] NACH DATENBEREINIGUNG – IMDb: 999 | RT: 17668
-[3] NACH DATENTRANSFORMATION – 618 gematchte Filme
+[3] NACH DATENTRANSFORMATION – 618 exakt + 23 fuzzy = 641 Filme
 [4] QUALITÄTSPRÜFUNG – ✓ Alle Prüfungen bestanden
-[5] ANALYSE-ERGEBNISSE – r(IMDb, RT-Kritiker): 0.222
+[5] ANALYSE-ERGEBNISSE – r(IMDb, RT-Kritiker): 0.227 [95% KI: 0.152–0.299]
 ✓ Pipeline vollständig abgeschlossen.
 ```
 
@@ -285,9 +296,10 @@ Die Pipeline gibt bei jedem Start detaillierte Statusmeldungen aus:
 
 | Datei | Zweck | Zeilen |
 |-------|-------|--------|
-| `pipeline.R` | 5-Schritt-Daten-Pipeline | ~280 |
+| `pipeline.R` | 5-Schritt-Daten-Pipeline (inkl. Fuzzy Matching + Inferenzstatistik) | ~320 |
 | `app.R` | Shiny Dashboard (UI + Server) | ~700 |
 | `install_packages.R` | Einmalige Package-Installation | ~35 |
+| `versions.txt` | Package-Versionen für Reproduzierbarkeit | – |
 | `imdb_top_1000.csv` | IMDb-Rohdaten | 1'000 |
 | `rotten_tomatoes_movies.csv` | RT-Rohdaten | 17'712 |
 | `README.md` | Projekt-Dokumentation | – |
