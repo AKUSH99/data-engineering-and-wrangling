@@ -64,7 +64,7 @@ clean_data <- function(raw) {
 
   df_imdb <- raw$imdb %>%
     mutate(
-      Released_Year    = suppressWarnings(as.numeric(Released_Year)),
+      Released_Year    = as.integer(suppressWarnings(as.numeric(Released_Year))),
       Title_clean      = str_to_lower(str_trim(Series_Title))
     ) %>%
     filter(!is.na(Released_Year), !is.na(IMDB_Rating))

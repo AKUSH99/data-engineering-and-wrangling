@@ -1,0 +1,11 @@
+# R-Artefakte
+.Rhistory
+.Rdata
+.RData
+.Ruserdata
+.Rproj.user/
+*.Rproj
+
+# System
+.DS_Store
+Thumbs.db
