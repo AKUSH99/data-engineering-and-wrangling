@@ -120,7 +120,7 @@ transform_data <- function(clean) {
   df_exact <- inner_join(
     clean$imdb, rt_cols,
     by = c("Title_clean", "Released_Year" = "release_year")
-  )
+  ) %>% mutate(match_type = "exact")
 
   # --- Stufe 2: Fuzzy Matching für nicht-gematchte ---
   imdb_unmatched <- clean$imdb %>%
@@ -140,7 +140,7 @@ transform_data <- function(clean) {
         fuzzy_rows[[length(fuzzy_rows) + 1]] <- bind_cols(
           row %>% select(-Title_clean),
           candidates[best_idx, ] %>% select(-Title_clean, -release_year)
-        )
+        ) %>% mutate(match_type = "fuzzy")
       }
     }
     if (length(fuzzy_rows) > 0) {
