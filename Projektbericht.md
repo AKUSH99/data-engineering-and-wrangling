@@ -111,7 +111,7 @@ Bei Verstössen bricht die Pipeline mit einer Fehlermeldung ab (`stopifnot`).
 
 ### 3.3 Dashboard-Entwicklung
 
-Das Ergebnis wird als **Shiny Dashboard** mit 7 thematischen Tabs präsentiert. Alle Visualisierungen sind interaktiv (Hover-Tooltips, Zoom, Filter). Das Dashboard nutzt ein dunkles Farbschema (Dark Theme) mit einheitlichen Farben:
+Das Ergebnis wird als **Shiny Dashboard** mit 8 thematischen Tabs präsentiert. Alle Visualisierungen sind interaktiv (Hover-Tooltips, Zoom, Filter). Das Dashboard nutzt ein dunkles Farbschema (Dark Theme) mit einheitlichen Farben:
 - Gold (#F5C518) für IMDb
 - Rot (#FA320A) für RT-Kritiker
 - Blau (#4A90D9) für RT-Publikum
@@ -231,9 +231,9 @@ Die Tomatometer-Status-Analyse zeigt:
 
 ### 5.1 Interpretation der Ergebnisse
 
-Die Analyse bestätigt die Hypothese, dass **Publikum und Kritiker Filme unterschiedlich bewerten**. Die schwache Korrelation (r = 0.222) zwischen IMDb und RT-Kritikern zeigt, dass professionelle Filmkritik anderen Massstäben folgt als die kollektive Publikumsmeinung.
+Die Analyse bestätigt die Hypothese, dass **Publikum und Kritiker Filme unterschiedlich bewerten**. Die schwache Korrelation (r = 0.227) zwischen IMDb und RT-Kritikern zeigt, dass professionelle Filmkritik anderen Massstäben folgt als die kollektive Publikumsmeinung.
 
-Gleichzeitig zeigt die moderate Korrelation (r = 0.541) zwischen den Publikumsbewertungen beider Plattformen, dass die "Stimme des Publikums" **plattformübergreifend konsistent** ist. Egal ob auf IMDb oder Rotten Tomatoes – Zuschauer bewerten ähnlich.
+Gleichzeitig zeigt die moderate Korrelation (r = 0.489) zwischen den Publikumsbewertungen beider Plattformen, dass die "Stimme des Publikums" **plattformübergreifend konsistent** ist. Egal ob auf IMDb oder Rotten Tomatoes – Zuschauer bewerten ähnlich.
 
 ### 5.2 Limitationen
 
@@ -297,7 +297,7 @@ Die Pipeline gibt bei jedem Start detaillierte Statusmeldungen aus:
 | Datei | Zweck | Zeilen |
 |-------|-------|--------|
 | `pipeline.R` | 5-Schritt-Daten-Pipeline (inkl. Fuzzy Matching + Inferenzstatistik) | ~320 |
-| `app.R` | Shiny Dashboard (UI + Server) | ~700 |
+| `app.R` | Shiny Dashboard (UI + Server) | ~1246 |
 | `install_packages.R` | Einmalige Package-Installation | ~35 |
 | `versions.txt` | Package-Versionen für Reproduzierbarkeit | – |
 | `imdb_top_1000.csv` | IMDb-Rohdaten | 1'000 |
