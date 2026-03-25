@@ -29,7 +29,7 @@ Die Datenverarbeitung erfolgt in einer **5-Schritt-Pipeline** (`pipeline.R`):
 
 ## Dashboard
 
-Das interaktive **Shiny Dashboard** (`app.R`) visualisiert die Ergebnisse in 7 Tabs:
+Das interaktive **Shiny Dashboard** (`app.R`) visualisiert die Ergebnisse in 8 Tabs:
 
 | Tab | Inhalt |
 |-----|--------|
@@ -39,6 +39,7 @@ Das interaktive **Shiny Dashboard** (`app.R`) visualisiert die Ergebnisse in 7 T
 | Zeittrend | Bewertungstrend nach Jahrzehnt (ab 1960er, n ≥ 48) |
 | Popularität | IMDb-Votes vs. Bewertungsdifferenz |
 | Zuverlässigkeit | Kritikanzahl, Tomatometer-Status, geflaggte Filme |
+| Datenqualität | Fehlende Werte, Duplikate, Match-Typen |
 | Datentabelle | Vollständiger Datensatz mit Filter und Suche |
 
 ## Zentrale Ergebnisse

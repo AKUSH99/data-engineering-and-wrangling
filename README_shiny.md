@@ -6,13 +6,8 @@
 ## Projektstruktur
 
 ```
-files 2/
-│
-├── imdb_top_1000.csv              ← Datensatz 1 (bereits vorhanden)
-├── rotten_tomatoes_movies.csv     ← Datensatz 2 (bereits vorhanden)
-│
-├── analyse_pipeline.py            ← Python-Pipeline (bestehend)
-├── requirements.txt               ← Python-Dependencies
+├── imdb_top_1000.csv              ← Datensatz 1 (IMDb Top 1000)
+├── rotten_tomatoes_movies.csv     ← Datensatz 2 (Rotten Tomatoes)
 │
 ├── install_packages.R             ← SCHRITT 1: einmalig ausführen
 ├── pipeline.R                     ← Daten-Pipeline in R (tidyverse)
@@ -27,11 +22,10 @@ files 2/
 In RStudio `install_packages.R` öffnen und auf **"Source"** klicken.
 
 ### Schritt 2 – Working Directory setzen
-RStudio öffnet standardmässig im Home-Verzeichnis.
-Sicherstellen dass das Working Directory stimmt:
+Sicherstellen dass das Working Directory auf den Projektordner zeigt:
 
 ```r
-setwd("/Users/claudio/Data Engineering & Wrangling/files 2")
+setwd("/Pfad/zum/Projekt")
 ```
 
 Oder in RStudio: **Session → Set Working Directory → To Source File Location**
@@ -51,6 +45,7 @@ Oder in RStudio: **Session → Set Working Directory → To Source File Location
 | Zeittrend | Bewertungstrend nach Jahrzehnt (ab 1960er) |
 | Popularität | IMDb-Votes vs. Bewertungsdifferenz |
 | Zuverlässigkeit | Kritikanzahl, tomatometer_status, geflaggte Filme |
+| Datenqualität | Fehlende Werte, Duplikate, Match-Typen |
 | Datentabelle | Vollständiger Datensatz mit Filter und Suche |
 
 ---
