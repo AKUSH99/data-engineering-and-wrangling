@@ -111,10 +111,78 @@ Bei Verstössen bricht die Pipeline mit einer Fehlermeldung ab (`stopifnot`).
 
 ### 3.3 Dashboard-Entwicklung
 
-Das Ergebnis wird als **Shiny Dashboard** mit 7 thematischen Tabs präsentiert. Alle Visualisierungen sind interaktiv (Hover-Tooltips, Zoom, Filter). Das Dashboard nutzt ein dunkles Farbschema (Dark Theme) mit einheitlichen Farben:
+Das Ergebnis wird als **Shiny Dashboard** mit 8 thematischen Tabs präsentiert. Alle Visualisierungen sind interaktiv (Hover-Tooltips, Zoom, Filter). Das Dashboard nutzt ein dunkles Farbschema (Dark Theme) mit einheitlichen Farben:
 - Gold (#F5C518) für IMDb
 - Rot (#FA320A) für RT-Kritiker
 - Blau (#4A90D9) für RT-Publikum
+
+#### Tab 1: Übersicht
+
+Die Startseite des Dashboards bietet einen kompakten Gesamtüberblick über die wichtigsten Kennzahlen des Projekts:
+
+- **4 KPI-Kacheln** (oben): Anzahl analysierter Filme (641), Pearson-Korrelation IMDb–Tomatometer, durchschnittliche Bewertungsdifferenz sowie ein Bias-Indikator.
+- **Bewertungsverteilung** (links): Histogramme der IMDb-Ratings (gold) und der normalisierten Tomatometer-Werte (rot) nebeneinander – zur Veranschaulichung der unterschiedlichen Verteilungen.
+- **Selektionsbias-Hinweis** (rechts): Erklärt, warum die IMDb-Ratings zwischen 7.6 und 9.3 liegen (nur Top-1000-Filme) und welchen Einfluss das auf die Interpretation hat.
+- **Scatterplot IMDb vs. Tomatometer** (unten links): Jeder Punkt repräsentiert einen Film; die Regressionslinie verdeutlicht die moderate positive Korrelation.
+- **Top-5-Abweichungen** (unten rechts): Zwei wechselbare Tabellen zeigen die 5 Filme mit dem grössten Vorsprung des IMDb-Publikums gegenüber den RT-Kritikern (Tab „IMDb >> RT") und umgekehrt (Tab „RT >> IMDb").
+
+#### Tab 2: Drei-Wege-Vergleich
+
+Dieser Tab vergleicht alle drei Bewertungsdimensionen (IMDb, RT-Kritiker, RT-Publikum) direkt miteinander:
+
+- **3 Korrelations-InfoBoxen** (oben): Pearson r mit 95%-Konfidenzintervall für jede der drei Paarungen – IMDb vs. RT-Kritiker (r ≈ 0.23), IMDb vs. RT-Publikum (r ≈ 0.49), RT-Kritiker vs. RT-Publikum (r ≈ 0.37).
+- **Drei Scatterplots** (Mitte): Nebeneinander angeordnete Streudiagramme für alle drei Vergleichspaare, jeweils mit Regressionslinie und Film-Tooltip beim Hovern.
+- **Balkendiagramm Ø Differenzen** (unten links): Zeigt die durchschnittlichen Abweichungen zwischen den Plattformen im direkten Vergleich.
+- **Interpretationstext** (unten rechts): Automatisch berechnete und formatierte Zusammenfassung der statistischen Befunde (t-Test, Cohen's d, Konfidenzintervalle).
+
+#### Tab 3: Genre-Analyse
+
+Untersucht, wie stark die Bewertungsunterschiede je nach Filmgenre variieren:
+
+- **Genre-Filter** (oben): Multiselect-Dropdown zur Auswahl beliebig vieler Genres; die Diagramme aktualisieren sich sofort reaktiv.
+- **Gruppiertes Balkendiagramm** (Mitte): Für jedes ausgewählte Genre werden die Durchschnittswerte aller drei Plattformen (IMDb, RT-Kritiker, RT-Publikum) nebeneinander dargestellt.
+- **Differenz-Balkendiagramm** (unten): Horizontale Balken zeigen die Differenz (IMDb − RT-Kritiker) je Genre – Genres mit der grössten Kritiker-Überbewertung (z.B. Animation −1.38) versus der kleinsten (z.B. Mystery −0.37) werden sofort sichtbar.
+
+#### Tab 4: Zeittrend
+
+Analysiert, ob sich die Bewertungsunterschiede über die Jahrzehnte verändert haben:
+
+- **Liniendiagramm Bewertungstrend** (Hauptvisualisierung): Zeigt die durchschnittlichen Bewertungen von IMDb und RT-Kritikern pro Jahrzehnt (1960er bis 2010er), wobei Dekaden mit weniger als 48 Filmen ausgeblendet werden. Die IMDb-Linie bleibt über die Jahrzehnte stabil (~7.9), während die Kritikerbewertungen schwanken (Höchstwert 9.30 in den 1970ern, Tiefstwert 8.15 in den 2000ern).
+- **Hinweisbox**: Erklärt, warum Jahrzehnte vor 1960 aus der Darstellung ausgeschlossen sind (zu wenige gematchte Filme; Survivorship-Bias durch einzelne Klassiker).
+
+#### Tab 5: Popularität
+
+Untersucht den Zusammenhang zwischen der Anzahl IMDb-Bewertungen (Popularität) und der Bewertungslücke:
+
+- **Scatterplot log10(Votes) vs. Differenz** (links): Jeder Film wird als Punkt dargestellt; auf der x-Achse die logarithmierte Stimmenzahl, auf der y-Achse die Bewertungsdifferenz (IMDb − RT-Kritiker). Ein Trend wird sichtbar: Sehr populäre Filme haben eine kleinere Lücke.
+- **Box-Plot Popularitäts-Bucket** (rechts): Fasst Filme in vier Gruppen (<100k, 100k–500k, 500k–1M, >1M Votes) zusammen und zeigt die Streuung der Bewertungslücke je Gruppe als Boxplot.
+- **Statistiktabelle** (unten): Tabellarische Übersicht mit Durchschnittswerten und Filmanzahl je Popularitäts-Bucket.
+
+#### Tab 6: Zuverlässigkeit
+
+Bewertet die Verlässlichkeit des Tomatometer-Scores in Abhängigkeit von der Anzahl vorliegender Kritikerbesprechungen:
+
+- **3 KPI-Kacheln** (oben): Median der Kritikanzahl pro Film (89), Anzahl Filme mit weniger als 20 Kritiken (9), Anzahl „Certified Fresh"-Filme (512 von 618 = 82.8%).
+- **Scatterplot Kritikanzahl vs. Tomatometer** (oben links): Zeigt, ob Filme mit wenigen Kritiken systematisch anders bewertet werden.
+- **Scatterplot Kritikanzahl vs. absolute Bewertungsdifferenz** (oben rechts): Prüft, ob eine geringe Kritikanzahl mit grösserer Unsicherheit (höherer Abweichung) einhergeht.
+- **Box-Plot Tomatometer-Status** (unten links): Vergleicht die IMDb-Ratings der drei Kategorien „Certified Fresh", „Fresh" und „Rotten" – die 13 „Rotten"-Filme sind trotz Top-1000-IMDb-Status von Kritikern als schlecht eingestuft.
+- **Tabelle geflaggter Filme** (unten rechts): Listet alle 9 Filme mit weniger als 20 Kritikerbesprechungen, die als potenziell unzuverlässig markiert wurden.
+
+#### Tab 7: Datenqualität
+
+Gibt vollständige Transparenz über die Datenqualität des gesamten Pipelines:
+
+- **4 KPI-Kacheln** (oben): Gesamtzahl fehlender Werte im finalen Datensatz, Anzahl Duplikate (0), Anzahl Match-Typen (exakt vs. fuzzy) und Anzahl unzuverlässiger Einträge.
+- **Qualitäts-Metriktabelle** (links): Listet alle automatischen Qualitätsprüfungen aus Schritt 4 der Pipeline mit Status „✓ Bestanden" oder „✗ Fehler".
+- **Balkendiagramm fehlende Werte** (rechts): Zeigt je Kernvariable (IMDB_Rating, tomatometer_normalized, etc.), wie viele Werte fehlen.
+- **Matching-Qualitäts-Diagramm** (unten links): Balkendiagramm mit der Aufteilung der 641 gematchten Filme in exakt (618) und Fuzzy-Match (23).
+- **Detailtabelle fehlende Werte** (unten rechts): Vollständige tabellarische Übersicht aller Variablen mit Anzahl und Anteil fehlender Werte.
+
+#### Tab 8: Datentabelle
+
+Bietet direkten Zugriff auf den vollständigen, gemergten Datensatz:
+
+- **Interaktive Datentabelle** (gesamte Breite): Alle 641 Filme mit sämtlichen Spalten (Titel, Erscheinungsjahr, Genre, IMDb-Rating, Tomatometer, Audience Score, Differenz usw.). Die Tabelle unterstützt Spalten-Sortierung, Volltextsuche sowie seitenweise Navigation und kann nach jeder Spalte gefiltert werden.
 
 ---
 
