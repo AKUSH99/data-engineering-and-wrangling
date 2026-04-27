@@ -11,12 +11,10 @@ files 2/
 ├── imdb_top_1000.csv              ← Datensatz 1 (bereits vorhanden)
 ├── rotten_tomatoes_movies.csv     ← Datensatz 2 (bereits vorhanden)
 │
-├── analyse_pipeline.py            ← Python-Pipeline (bestehend)
-├── requirements.txt               ← Python-Dependencies
-│
 ├── install_packages.R             ← SCHRITT 1: einmalig ausführen
-├── pipeline.R                     ← Daten-Pipeline in R (tidyverse)
-└── app.R                          ← SCHRITT 2: Shiny Dashboard starten
+├── pipeline.R                     ← Daten-Pipeline in R (tidyverse, ETL)
+├── processed_data.rds             ← Generierter Datensatz nach ETL-Durchlauf
+└── app.R                          ← SCHRITT 2: Shiny Dashboard starten (liest rds)
 ```
 
 ---
@@ -51,6 +49,7 @@ Oder in RStudio: **Session → Set Working Directory → To Source File Location
 | Zeittrend | Bewertungstrend nach Jahrzehnt (ab 1960er) |
 | Popularität | IMDb-Votes vs. Bewertungsdifferenz |
 | Zuverlässigkeit | Kritikanzahl, tomatometer_status, geflaggte Filme |
+| Datenqualität | Transparente Quality Assurance und Missingness Reports |
 | Datentabelle | Vollständiger Datensatz mit Filter und Suche |
 
 ---
@@ -58,5 +57,5 @@ Oder in RStudio: **Session → Set Working Directory → To Source File Location
 ## Hinweise
 
 - Die **CSVs müssen im selben Ordner** liegen wie `pipeline.R` und `app.R`
-- Beim ersten Start werden die Daten automatisch durch `pipeline.R` geladen
-- Alle Qualitätsprüfungen laufen automatisch beim App-Start (Konsole prüfen)
+- Beim ersten App-Start wird die Pipeline automatisch getriggert und als `processed_data.rds` gespeichert (ETL-Prinzip).
+- Danach ist die Pipeline idempotente, das Dashboard startet schneller.

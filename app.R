@@ -16,12 +16,18 @@ library(RColorBrewer)
 source("pipeline.R")
 
 # ==========================================
-# ROBUSTES LADEN DER PIPELINE
+# ROBUSTES LADEN DER DATEN (ETL-Prinzip)
 # ==========================================
+if (!file.exists("processed_data.rds")) {
+  message("Keine verarbeiteten Daten gefunden. Führe Daten-Pipeline initial aus...")
+  source("pipeline.R")
+  run_pipeline()
+}
+
 result <- tryCatch(
-  run_pipeline(),
+  readRDS("processed_data.rds"),
   error = function(e) {
-    stop("Pipeline konnte nicht ausgeführt werden: ", e$message)
+    stop("Daten konnten nicht geladen werden: ", e$message, "\nStarte 'pipeline.R' manuell!")
   }
 )
 

@@ -66,7 +66,10 @@ clean_data <- function(raw) {
   df_imdb <- raw$imdb %>%
     mutate(
       Released_Year    = as.integer(suppressWarnings(as.numeric(Released_Year))),
-      Title_clean      = str_to_lower(str_trim(Series_Title))
+      Title_clean      = str_to_lower(str_trim(Series_Title)) %>%
+                           str_replace_all("^(the|a|an)\\s+", "") %>%
+                           str_replace_all("[[:punct:]]", "") %>%
+                           str_squish()
     ) %>%
     filter(!is.na(Released_Year), !is.na(IMDB_Rating))
 
@@ -77,7 +80,10 @@ clean_data <- function(raw) {
     filter(!is.na(tomatometer_rating), !is.na(movie_title)) %>%
     mutate(
       release_year     = as.integer(format(as.Date(original_release_date), "%Y")),
-      Title_clean      = str_to_lower(str_trim(movie_title))
+      Title_clean      = str_to_lower(str_trim(movie_title)) %>%
+                           str_replace_all("^(the|a|an)\\s+", "") %>%
+                           str_replace_all("[[:punct:]]", "") %>%
+                           str_squish()
     )
 
   message(sprintf("[2] NACH DATENBEREINIGUNG"))
@@ -346,6 +352,10 @@ run_pipeline <- function(imdb_path = "imdb_top_1000.csv",
   checks  <- quality_check(merged)
   stats   <- compute_stats(merged)
 
+  output_list <- list(data = merged, stats = stats, checks = checks)
+  saveRDS(output_list, "processed_data.rds")
+  message("    ✓ Daten & Statistiken exportiert -> processed_data.rds")
+
   message("\n✓ Pipeline vollständig abgeschlossen.")
-  list(data = merged, stats = stats, checks = checks)
+  output_list
 }

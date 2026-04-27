@@ -67,11 +67,14 @@ Die zwei CSV-Dateien werden mit `readr::read_csv()` eingelesen. Bevor die Dateie
 
 **Ergebnis:** IMDb: 1'000 Zeilen | RT: 17'712 Zeilen
 
-#### Schritt 2: Datenbereinigung
+#### Schritt 2: Datenbereinigung und Regular Expressions
 
 - **IMDb:** Die Spalte `Released_Year` enthält vereinzelt nicht-numerische Werte (z.B. "PG"). Diese werden über `as.integer(as.numeric())` in NA konvertiert und anschliessend entfernt. Ergebnis: 999 Zeilen (1 entfernt).
 - **Rotten Tomatoes:** Filme ohne Tomatometer-Rating oder Titel werden entfernt. Das Erscheinungsjahr wird aus dem Datum extrahiert. Ergebnis: 17'668 Zeilen (44 entfernt).
-- **Beide:** Filmtitel werden für den späteren Join normalisiert: Kleinbuchstaben, Leerzeichen getrimmt.
+- **Beide (Regex-Einsatz):** Filmtitel werden für den späteren Join mit **Regular Expressions** umfassend normalisiert:
+  - Kleinbuchstaben, Leerzeichen getrimmt.
+  - Artikel ("the", "a", "an") am Anfang werden per `str_replace_all()` gezielt entfernt, um Fehler bei leichten Variationen ("The Matrix" vs "Matrix") abzufangen.
+  - Sonderzeichen und Satzzeichen (`[[:punct:]]`) werden bereinigt und redundante Leerzeichen durch `str_squish()` ersetzt.
 
 #### Schritt 3: Transformation & Merge
 
@@ -206,7 +209,7 @@ Um Konsistenz und Wartbarkeit sicherzustellen, wurden folgende **Software-Engine
 
 4. **Serverseitiges Selectize-Input**: Der Genre-Filter nutzt `server = TRUE`, um bei vielen Optionen die UI-Performance zu erhalten.
 
-5. **Trennung von Logik und Darstellung**: Die Daten-Pipeline (`pipeline.R`) ist komplett vom Dashboard (`app.R`) getrennt. Die Pipeline kann unabhängig ausgeführt und getestet werden; das Dashboard empfängt nur das fertige Ergebnis.
+5. **ETL-Architektur und Idempotenz**: Die Daten-Pipeline (`pipeline.R`) ist komplett vom Dashboard (`app.R`) getrennt und folgt Idempotenz-Grundsätzen. Sie aggregiert und prüft die CSVs, persistiert das fertige Resultat als `.rds`-File incl. Check-Reports und beendet sich. Das Dashboard lädt nur den vorab erzeugten Export.
 
 6. **Durchgängiges CSS-Dark-Theme**: Über 100 Zeilen Custom-CSS stellen sicher, dass alle Komponenten (Sidebar, Boxen, Tabellen, DT, Selectize-Inputs, Plotly-Toolbar) im dunklen Farbschema konsistent dargestellt werden.
 

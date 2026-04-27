@@ -29,7 +29,7 @@ Die Datenverarbeitung erfolgt in einer **5-Schritt-Pipeline** (`pipeline.R`):
 
 ## Dashboard
 
-Das interaktive **Shiny Dashboard** (`app.R`) visualisiert die Ergebnisse in 7 Tabs:
+Das interaktive **Shiny Dashboard** (`app.R`) visualisiert die Ergebnisse in 8 Tabs:
 
 | Tab | Inhalt |
 |-----|--------|
@@ -39,6 +39,7 @@ Das interaktive **Shiny Dashboard** (`app.R`) visualisiert die Ergebnisse in 7 T
 | Zeittrend | Bewertungstrend nach Jahrzehnt (ab 1960er, n ≥ 48) |
 | Popularität | IMDb-Votes vs. Bewertungsdifferenz |
 | Zuverlässigkeit | Kritikanzahl, Tomatometer-Status, geflaggte Filme |
+| Datenqualität | Transparente Quality Assurance und Reporting |
 | Datentabelle | Vollständiger Datensatz mit Filter und Suche |
 
 ## Zentrale Ergebnisse
@@ -70,15 +71,18 @@ Alternativ in RStudio: `app.R` öffnen → **Run App** klicken.
 
 - **R** mit tidyverse (dplyr, readr, tidyr, stringr)
 - **stringdist** – Fuzzy Matching (Jaro-Winkler-Distanz)
+- **Regex** – Normalisierung und Vorverarbeitung unstrukturierter Spalten
 - **Shiny + shinydashboard** – Interaktives Web-Dashboard
 - **plotly + ggplot2** – Interaktive Visualisierungen
 - **DT** – Filterbare Datentabellen
+- **ETL-Architektur** – Idempotenter Batch-Prozess mit `.rds`-Ausgabe
 
 ## Projektstruktur
 
 ```
-├── app.R                          ← Shiny Dashboard (UI + Server)
-├── pipeline.R                     ← 5-Schritt Daten-Pipeline
+├── app.R                          ← Shiny Dashboard (UI + Server, Read-Only)
+├── pipeline.R                     ← 5-Schritt Daten-Pipeline (ETL-Batch)
+├── processed_data.rds             ← Verarbeitetes Analyseobjekt (wird von Pipeline generiert)
 ├── install_packages.R             ← Einmalige Package-Installation
 ├── versions.txt                   ← Package-Versionen für Reproduzierbarkeit
 ├── imdb_top_1000.csv              ← IMDb-Datensatz
