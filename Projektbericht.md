@@ -397,6 +397,33 @@ Die Pipeline gibt bei jedem Start detaillierte Statusmeldungen aus:
 
 ---
 
+## 8. Quellen
+
+### 8.1 Datensätze
+
+- **IMDb Top 1000 Movies Dataset.** Kaggle (Public Dataset Repository). Heruntergeladen am 2026-03-20. URL: <https://www.kaggle.com/datasets/harshitshankhdhar/imdb-dataset-of-top-1000-movies-and-tv-shows>
+- **Rotten Tomatoes Movies and Critic Reviews Dataset.** Kaggle (Public Dataset Repository). Heruntergeladen am 2026-03-20. URL: <https://www.kaggle.com/datasets/stefanoleone992/rotten-tomatoes-movies-and-critic-reviews-dataset>
+
+> Die Dateien `imdb_top_1000.csv` und `rotten_tomatoes_movies.csv` liegen unverändert (Rohzustand) im Projektverzeichnis. Die Originalquellen sollten vor der Re-Ausführung der Pipeline auf aktuelle Versionen geprüft werden.
+
+### 8.2 Statistische Methoden
+
+- **Cohen, J. (1988).** *Statistical Power Analysis for the Behavioral Sciences* (2. Aufl.). Lawrence Erlbaum Associates. — Konvention für Effektstärken (klein |d| ≥ 0.2, mittel |d| ≥ 0.5, gross |d| ≥ 0.8).
+- **Jaro, M. A. (1989).** Advances in record-linkage methodology as applied to matching the 1985 census of Tampa, Florida. *Journal of the American Statistical Association*, 84(406), 414–420. — Grundlage der Jaro-Distanz.
+- **Winkler, W. E. (1990).** String Comparator Metrics and Enhanced Decision Rules in the Fellegi-Sunter Model of Record Linkage. *Proceedings of the Section on Survey Research Methods, American Statistical Association*, 354–359. — Erweiterung zur Jaro-Winkler-Distanz, eingesetzt im Fuzzy Matching (Schritt 3).
+
+### 8.3 Software
+
+- **R Core Team (2025).** *R: A Language and Environment for Statistical Computing*. R Foundation for Statistical Computing, Wien. <https://www.R-project.org/>
+- **Wickham, H. et al. (2019).** Welcome to the tidyverse. *Journal of Open Source Software*, 4(43), 1686. <https://doi.org/10.21105/joss.01686>
+- **van der Loo, M. P. J. (2014).** The stringdist Package for Approximate String Matching. *The R Journal*, 6(1), 111–122.
+- **Chang, W. et al.** *shiny: Web Application Framework for R.* R-Package. <https://CRAN.R-project.org/package=shiny>
+- **Sievert, C. (2020).** *Interactive Web-Based Data Visualization with R, plotly, and shiny.* Chapman & Hall/CRC.
+
+> Die exakten Versionen der eingesetzten Packages sind in `versions.txt` (manuell gepflegt) und `sessionInfo.txt` (automatisch generiert via `install_packages.R`) dokumentiert.
+
+---
+
 ## Anhang: Projektstruktur
 
 | Datei | Zweck | Zeilen |

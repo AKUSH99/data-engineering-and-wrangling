@@ -83,8 +83,9 @@ Alternativ in RStudio: `app.R` öffnen → **Run App** klicken.
 ├── app.R                          ← Shiny Dashboard (UI + Server, Read-Only)
 ├── pipeline.R                     ← 5-Schritt Daten-Pipeline (ETL-Batch)
 ├── processed_data.rds             ← Verarbeitetes Analyseobjekt (wird von Pipeline generiert)
-├── install_packages.R             ← Einmalige Package-Installation
-├── versions.txt                   ← Package-Versionen für Reproduzierbarkeit
+├── install_packages.R             ← Einmalige Package-Installation (schreibt sessionInfo.txt)
+├── versions.txt                   ← Package-Versionen (manuell gepflegt)
+├── sessionInfo.txt                ← Auto-generierter Reproduzierbarkeits-Snapshot
 ├── imdb_top_1000.csv              ← IMDb-Datensatz
 ├── rotten_tomatoes_movies.csv     ← Rotten-Tomatoes-Datensatz
 ├── Projektbericht.md              ← Wissenschaftlicher Projektbericht

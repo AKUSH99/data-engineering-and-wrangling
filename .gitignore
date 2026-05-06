@@ -10,6 +10,9 @@ renv/
 renv.lock
 _stats.txt
 
+# Pipeline-Output (Build-Artefakt, wird durch pipeline.R regeneriert)
+processed_data.rds
+
 # System
 .DS_Store
 Thumbs.db
