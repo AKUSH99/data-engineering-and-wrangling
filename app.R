@@ -289,6 +289,86 @@ ui <- dashboardPage(
       tabItem(
         tabName = "overview",
         fluidRow(
+          box(
+            width = 12, solidHeader = TRUE,
+            title = "Kernbefunde auf einen Blick",
+            tags$div(
+              style = "display:flex; gap:16px; flex-wrap:wrap; padding:4px 2px;",
+
+              # Finding 1: Publikum-Konsens
+              tags$div(
+                style = paste0(
+                  "flex:1; min-width:240px; padding:16px 18px;",
+                  "background:#15233f; border-left:4px solid ", COLORS$audience, ";",
+                  "border-radius:4px;"
+                ),
+                tags$div(
+                  style = paste0("color:", COLORS$audience,
+                                 "; font-size:11px; letter-spacing:1.6px; font-weight:bold;"),
+                  "01  PUBLIKUM-KONSENS"
+                ),
+                tags$div(
+                  style = "color:#fff; font-size:26px; font-weight:bold; margin:6px 0 8px;",
+                  paste0("r = ", round(stats$corr_audience, 2))
+                ),
+                tags$div(
+                  style = "color:#ddd; font-size:13px; line-height:1.5;",
+                  "IMDb- und RT-Publikum stimmen ", tags$b("plattformübergreifend"),
+                  " überein – die kollektive Zuschauermeinung ist konsistent."
+                )
+              ),
+
+              # Finding 2: Kritiker-Abweichung
+              tags$div(
+                style = paste0(
+                  "flex:1; min-width:240px; padding:16px 18px;",
+                  "background:#2a1a1f; border-left:4px solid ", COLORS$critics, ";",
+                  "border-radius:4px;"
+                ),
+                tags$div(
+                  style = paste0("color:", COLORS$critics,
+                                 "; font-size:11px; letter-spacing:1.6px; font-weight:bold;"),
+                  "02  KRITIKER-ABWEICHUNG"
+                ),
+                tags$div(
+                  style = "color:#fff; font-size:26px; font-weight:bold; margin:6px 0 8px;",
+                  paste0("Δ ", sprintf("%.1f", abs(stats$avg_diff)), " Punkte")
+                ),
+                tags$div(
+                  style = "color:#ddd; font-size:13px; line-height:1.5;",
+                  "RT-Kritiker bewerten dieselben Filme im Schnitt ",
+                  tags$b("höher"), " als das IMDb-Publikum (Cohen's d = ",
+                  sprintf("%.2f", stats$cohens_d), ", grosser Effekt)."
+                )
+              ),
+
+              # Finding 3: Kontext / Modulatoren
+              tags$div(
+                style = paste0(
+                  "flex:1; min-width:240px; padding:16px 18px;",
+                  "background:#2a2510; border-left:4px solid ", COLORS$imdb, ";",
+                  "border-radius:4px;"
+                ),
+                tags$div(
+                  style = paste0("color:", COLORS$imdb,
+                                 "; font-size:11px; letter-spacing:1.6px; font-weight:bold;"),
+                  "03  KONTEXT-FAKTOREN"
+                ),
+                tags$div(
+                  style = "color:#fff; font-size:26px; font-weight:bold; margin:6px 0 8px;",
+                  paste0(stats$n_total, " Filme")
+                ),
+                tags$div(
+                  style = "color:#ddd; font-size:13px; line-height:1.5;",
+                  tags$b("Animation"), " & ", tags$b("Comedy"),
+                  " zeigen die grössten Differenzen; Filme mit > 1 Mio. Votes ",
+                  tags$b("fast ohne Lücke"), "."
+                )
+              )
+            )
+          )
+        ),
+        fluidRow(
           valueBoxOutput("box_total", width = 3),
           valueBoxOutput("box_corr", width = 3),
           valueBoxOutput("box_avg_diff", width = 3),
@@ -754,6 +834,8 @@ server <- function(input, output, session) {
   # PLOT: SCATTER MIT TRENDLINIE
   # ------------------------------------------
   output$plot_scatter <- renderPlotly({
+    share_rt_higher <- mean(df$rating_diff < 0, na.rm = TRUE)
+
     p <- ggplot(
       df,
       aes(
@@ -772,6 +854,10 @@ server <- function(input, output, session) {
       geom_smooth(method = "lm", se = FALSE, color = "white", linewidth = 0.7) +
       annotate("text", x = 3.2, y = 9.15, color = "white", size = 3.4,
                label = paste0("Pearson r = ", round(stats$corr_critics, 3))) +
+      annotate("text", x = 9.8, y = 7.75, color = COLORS$critics, size = 3.0, hjust = 1,
+               label = paste0(round(share_rt_higher * 100), "% unter Diagonale: RT-Kritiker > IMDb")) +
+      annotate("text", x = 2.7, y = 7.62, color = COLORS$imdb, size = 3.0, hjust = 0,
+               label = paste0(round((1 - share_rt_higher) * 100), "% darüber: IMDb > RT-Kritiker")) +
       labs(x = "Tomatometer (normalisiert, 0–10)", y = "IMDb Rating (0–10)") +
       theme_dashboard()
 
@@ -933,6 +1019,10 @@ server <- function(input, output, session) {
     gs$primary_genre <- factor(gs$primary_genre, levels = gs$primary_genre)
     bar_colors <- ifelse(gs$avg_diff > 0, COLORS$imdb, COLORS$critics)
 
+    extreme_idx   <- which.max(abs(gs$avg_diff))
+    extreme_diff  <- gs$avg_diff[extreme_idx]
+    extreme_genre <- as.character(gs$primary_genre[extreme_idx])
+
     plot_ly(
       gs, x = ~avg_diff, y = ~primary_genre, type = "bar", orientation = "h",
       marker = list(color = bar_colors, line = list(color = "black", width = 0.5)),
@@ -941,6 +1031,14 @@ server <- function(input, output, session) {
     ) %>%
       add_segments(x = 0, xend = 0, y = 0.5, yend = nrow(gs) + 0.5,
                    line = list(color = "white", width = 1)) %>%
+      add_annotations(
+        x = extreme_diff, y = extreme_genre,
+        text = "Grösste Plattform-Differenz",
+        showarrow = TRUE, arrowcolor = "#aaa", arrowhead = 2, arrowsize = 0.8,
+        ax = ifelse(extreme_diff < 0, -70, 70), ay = -18,
+        font = list(color = COLORS$critics, size = 10),
+        bgcolor = "rgba(15,15,35,0.85)", bordercolor = "#444", borderpad = 3
+      ) %>%
       plotly_dark_layout(
         xaxis = list(title = "Ø IMDb − Ø Tomatometer (normalisiert)"),
         yaxis = list(title = "")
@@ -953,6 +1051,9 @@ server <- function(input, output, session) {
   output$plot_decade <- renderPlotly({
     ds <- stats$decade_stats
     req(!is.null(ds), nrow(ds) > 0)
+
+    peak_idx <- which.max(ds$avg_critics)
+    low_idx  <- which.min(ds$avg_critics)
 
     plot_ly(ds) %>%
       add_trace(
@@ -972,6 +1073,22 @@ server <- function(input, output, session) {
         marker = list(color = COLORS$critics, size = 8),
         text = ~paste0(decade, "er | n=", count, "<br>RT Kritiker: ", round(avg_critics, 2)),
         hoverinfo = "text"
+      ) %>%
+      add_annotations(
+        x = ds$decade[peak_idx], y = ds$avg_critics[peak_idx],
+        text = "Peak: New-Hollywood-Ära",
+        showarrow = TRUE, arrowcolor = "#aaa", arrowhead = 2, arrowsize = 0.8,
+        ax = 50, ay = -28,
+        font = list(color = COLORS$critics, size = 11),
+        bgcolor = "rgba(15,15,35,0.85)", bordercolor = "#444", borderpad = 4
+      ) %>%
+      add_annotations(
+        x = ds$decade[low_idx], y = ds$avg_critics[low_idx],
+        text = "Tief: Franchise-Dominanz",
+        showarrow = TRUE, arrowcolor = "#aaa", arrowhead = 2, arrowsize = 0.8,
+        ax = -40, ay = 32,
+        font = list(color = COLORS$muted, size = 11),
+        bgcolor = "rgba(15,15,35,0.85)", bordercolor = "#444", borderpad = 4
       ) %>%
       plotly_dark_layout(
         yaxis = list(title = "Ø Bewertung (0–10)", range = c(6.5, 10.5)),
