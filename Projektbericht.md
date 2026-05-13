@@ -117,7 +117,7 @@ Im Folgenden wird jeder Tab mit Screenshot und Beschreibung dokumentiert.
 
 #### Tab 1: Übersicht – Kernbefunde auf einen Blick
 
-![[01_Uebersicht.png]]
+![Tab 1: Übersicht](screenshots/01_Uebersicht.png)
 
 Der Einstiegs-Tab gibt einen kompakten Gesamtüberblick über den Datensatz. Oben drei gestylte Kernbefund-Karten mit farbigen Seitenrändern: Blau markiert den Publikum-Konsens (r = 0.49, „IMDb- und RT-Publikum stimmen plattformübergreifend überein"), Rot die Kritiker-Abweichung (Δ 0.9 Punkte, Cohen's d = −0.88), Gold die Kontext-Faktoren (644 Filme, „Animation & Comedy zeigen die grössten Differenzen; Filme mit > 1 Mio. Votes fast ohne Lücke").
 
@@ -129,7 +129,7 @@ Rechts daneben eine Infobox zum Selektionsbias: „IMDb-Ratings: 7.6 – 9.3 (ni
 
 #### Tab 2: Drei-Wege-Vergleich – Publikum vs. Kritiker vs. Publikum
 
-![[02_Drei_Wege_Vergleich.png]]
+![Tab 2: Drei-Wege-Vergleich](screenshots/02_Drei_Wege_Vergleich.png)
 
 Dieser Tab erweitert die Analyse um die dritte Bewertungsdimension: den RT-Audience-Score (Publikumsbewertung auf Rotten Tomatoes). Oben drei InfoBoxen mit den paarweisen Korrelationen und automatischen Labels: IMDb vs. RT-Kritiker (r = 0.228, „schwache Korrelation"), IMDb vs. RT-Publikum (r = 0.49, „mittlere Korrelation"), RT-Kritiker vs. RT-Publikum (r = 0.371, „schwache Korrelation").
 
@@ -141,7 +141,7 @@ Unten links ein horizontales Balkendiagramm der Ø-Differenzen: IMDb − RT-Krit
 
 #### Tab 3: Genre-Analyse – Wo gehen die Meinungen auseinander?
 
-![[03_Genre_Analyse.png]]
+![Tab 3: Genre-Analyse](screenshots/03_Genre_Analyse.png)
 
 Oben ein Filter-Box mit SelectizeInput (9 Genres: Action, Adventure, Animation, Biography, Comedy, Crime, Drama, Horror, Mystery – alle standardmässig aktiv). Darunter ein Grouped Bar Chart (y-Achse 6.5–10) mit drei Balken pro Genre: Gold = IMDb, Rot = RT-Kritiker, Blau = RT-Publikum. Die Genres sind nach Ø IMDb-Rating sortiert.
 
@@ -151,7 +151,7 @@ Darunter ein horizontales Balkendiagramm der Ø-Bewertungsdifferenz (IMDb − To
 
 #### Tab 4: Zeittrend – Bewertungen über die Jahrzehnte
 
-![[04_Zeittrend.png]]
+![Tab 4: Zeittrend](screenshots/04_Zeittrend.png)
 
 Ein Liniendiagramm über sechs Jahrzehnte (1960er bis 2010er, y-Achse 6.5–10.5). Die goldene Linie (IMDb, Marker-Grösse 8) bleibt nahezu flach bei ~7.9. Die rote Linie (RT-Kritiker normalisiert) schwankt stärker: Höchstwert in den 1970ern (9.30), Tiefpunkt in den 2000ern (8.15), Erholung auf 8.88 in den 2010ern. Zwei Annotationen mit Pfeilen: „Peak: New-Hollywood-Ära" und „Tief: Franchise-Dominanz". Der Tooltip zeigt pro Jahrzehnt Dekade, Anzahl Filme, Ø IMDb und Ø RT-Kritiker.
 
@@ -161,7 +161,7 @@ Unten ein Hinweistext: „Jahrzehnte vor 1960 ausgeblendet: Die wenigen gematcht
 
 #### Tab 5: Popularität – Bekanntheit vs. Bewertungsunterschied
 
-![[05_Popularitaet.png]]
+![Tab 5: Popularität](screenshots/05_Popularitaet.png)
 
 Links ein Scatterplot (ggplotly): x-Achse log10(Anzahl IMDb-Votes, Bereich 4.5–6.0), y-Achse Differenz IMDb − RT-Kritiker (Bereich −2 bis +4). Punkte sind nach IMDb-Rating eingefärbt (Farbskala Blau 8.0 bis Rot 9.0). Gestrichelte weisse Nulllinie und weisse Regresslinie – je mehr Votes, desto kleiner die Differenz.
 
@@ -171,7 +171,7 @@ Rechts ein Boxplot nach vier Vote-Buckets (<100k, 100k–500k, 500k–1M, >1M) m
 
 #### Tab 6: Zuverlässigkeit – Wie belastbar sind die Kritiken?
 
-![[06_Zuverlaessigkeit.png]]
+![Tab 6: Zuverlässigkeit](screenshots/06_Zuverlaessigkeit.png)
 
 Oben drei ValueBoxen: Median der Kritikanzahl (90, Gelb), 9 Filme mit < 20 Kritiken (geflaggt, Rot), 532 Certified-Fresh-Filme (Grün). In der nächsten Zeile zwei Scatterplots nebeneinander: Links „Kritikanzahl vs. Tomatometer-Rating" (x-Achse 0–600, y-Achse 40–100%) – Punkte nach Tomatometer-Status eingefärbt (Certified-Fresh, Fresh, Rotten), gestrichelte 20-Kritiken-Linie. Rechts „Kritikanzahl vs. absolute Bewertungsdifferenz" (x-Achse 0–600, y-Achse 0–5, Blaue Punkte) mit Trendlinie.
 
@@ -181,7 +181,7 @@ Darunter ein Boxplot „IMDb Rating nach Tomatometer-Status" (y-Achse 8.0–9.0)
 
 #### Tab 7: Datenqualität – Transparente Qualitätssicherung
 
-![[07_Datenqualitaet.png]]
+![Tab 7: Datenqualität](screenshots/07_Datenqualitaet.png)
 
 Oben vier ValueBoxen: Fehlende Kernwerte (0), Dubletten (0), Match-Typen erkannt (2), Potenziell instabile RT-Werte (9). Links eine DT-Tabelle „Datenqualitäts-Kennzahlen" mit 11 Zeilen (z.B. Zeilen im Datensatz 644, fehlende Werte je 0, IMDb-Min/Max 7.6/9.3, RT-Min/Max 2.6/10, Filme < 20 Kritiken 9, Distinct Genres 13).
 
@@ -191,7 +191,7 @@ Rechts ein horizontales Balkendiagramm „Fehlende Werte je Kernvariable" – 7 
 
 #### Tab 8: Datentabelle – Der vollständige Datensatz
 
-![[08_Datentabelle.png]]
+![Tab 8: Datentabelle](screenshots/08_Datentabelle.png)
 
 Der letzte Tab bietet alle 644 Filme als interaktive DT-Tabelle mit 12 Spalten: Film, Jahr, Genre, IMDb, RT-Kritiker, RT-Publikum, Differenz, |Differenz|, Anz. Kritiken, Status, Votes, match_type (exact/fuzzy). Jede Spalte hat eine eigene Filter-Box und ist sortierbar. Oben links ein Dropdown für die Anzahl angezeigter Zeilen (10/15/25/50/100), oben rechts eine globale Suchfunktion. Beispiel: The Shawshank Redemption (1994, Drama, IMDb 9.3, RT-Kritiker 9.1, RT-Publikum 9.8, Differenz 0.2, 75 Kritiken, Certified-Fresh, 2.3 Mio. Votes, exact).
 
