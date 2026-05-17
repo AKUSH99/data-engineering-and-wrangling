@@ -162,7 +162,6 @@ Unten ein Hinweistext: „Jahrzehnte vor 1960 ausgeblendet: Die wenigen gematcht
 #### Tab 5: Popularität – Bekanntheit vs. Bewertungsunterschied
 
 ![Tab 4: Zeittrend](screenshots/04_Zeittrend.png)
-![Tab 5: Popularität](screenshots/05_Popularitaet.png)
 
 Links ein Scatterplot (ggplotly): x-Achse log10(Anzahl IMDb-Votes, Bereich 4.5–6.0), y-Achse Differenz IMDb − RT-Kritiker (Bereich −2 bis +4). Punkte sind nach IMDb-Rating eingefärbt (Farbskala Blau 8.0 bis Rot 9.0). Gestrichelte weisse Nulllinie und weisse Regresslinie – je mehr Votes, desto kleiner die Differenz.
 
@@ -172,7 +171,7 @@ Rechts ein Boxplot nach vier Vote-Buckets (<100k, 100k–500k, 500k–1M, >1M) m
 
 #### Tab 6: Zuverlässigkeit – Wie belastbar sind die Kritiken?
 
-![Tab 6: Zuverlässigkeit](screenshots/06_Zuverlaessigkeit.png)
+![Tab 5: Popularität](screenshots/05_Popularitaet.png)
 
 Oben drei ValueBoxen: Median der Kritikanzahl (90, Gelb), 9 Filme mit < 20 Kritiken (geflaggt, Rot), 532 Certified-Fresh-Filme (Grün). In der nächsten Zeile zwei Scatterplots nebeneinander: Links „Kritikanzahl vs. Tomatometer-Rating" (x-Achse 0–600, y-Achse 40–100%) – Punkte nach Tomatometer-Status eingefärbt (Certified-Fresh, Fresh, Rotten), gestrichelte 20-Kritiken-Linie. Rechts „Kritikanzahl vs. absolute Bewertungsdifferenz" (x-Achse 0–600, y-Achse 0–5, Blaue Punkte) mit Trendlinie.
 
@@ -182,7 +181,7 @@ Darunter ein Boxplot „IMDb Rating nach Tomatometer-Status" (y-Achse 8.0–9.0)
 
 #### Tab 7: Datenqualität – Transparente Qualitätssicherung
 
-![Tab 7: Datenqualität](screenshots/07_Datenqualitaet.png)
+![Tab 6: Zuverlässigkeit](screenshots/06_Zuverlaessigkeit.png)
 
 Oben vier ValueBoxen: Fehlende Kernwerte (0), Dubletten (0), Match-Typen erkannt (2), Potenziell instabile RT-Werte (9). Links eine DT-Tabelle „Datenqualitäts-Kennzahlen" mit 11 Zeilen (z.B. Zeilen im Datensatz 644, fehlende Werte je 0, IMDb-Min/Max 7.6/9.3, RT-Min/Max 2.6/10, Filme < 20 Kritiken 9, Distinct Genres 13).
 
