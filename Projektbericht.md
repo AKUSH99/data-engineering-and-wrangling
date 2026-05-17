@@ -191,7 +191,7 @@ Rechts ein horizontales Balkendiagramm „Fehlende Werte je Kernvariable" – 7 
 
 #### Tab 8: Datentabelle – Der vollständige Datensatz
 
-![Tab 8: Datentabelle](screenshots/08_Datentabelle.png)
+![Tab 7: Datenqualität](screenshots/07_Datenqualitaet.png)
 
 Der letzte Tab bietet alle 644 Filme als interaktive DT-Tabelle mit 12 Spalten: Film, Jahr, Genre, IMDb, RT-Kritiker, RT-Publikum, Differenz, |Differenz|, Anz. Kritiken, Status, Votes, match_type (exact/fuzzy). Jede Spalte hat eine eigene Filter-Box und ist sortierbar. Oben links ein Dropdown für die Anzahl angezeigter Zeilen (10/15/25/50/100), oben rechts eine globale Suchfunktion. Beispiel: The Shawshank Redemption (1994, Drama, IMDb 9.3, RT-Kritiker 9.1, RT-Publikum 9.8, Differenz 0.2, 75 Kritiken, Certified-Fresh, 2.3 Mio. Votes, exact).
 
