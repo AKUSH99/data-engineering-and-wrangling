@@ -151,7 +151,6 @@ Darunter ein horizontales Balkendiagramm der Ø-Bewertungsdifferenz (IMDb − To
 
 #### Tab 4: Zeittrend – Bewertungen über die Jahrzehnte
 
-![Tab 4: Zeittrend](screenshots/04_Zeittrend.png)
 ![Tab 8: Datentabelle](screenshots/08_Datentabelle.png)
 
 Ein Liniendiagramm über sechs Jahrzehnte (1960er bis 2010er, y-Achse 6.5–10.5). Die goldene Linie (IMDb, Marker-Grösse 8) bleibt nahezu flach bei ~7.9. Die rote Linie (RT-Kritiker normalisiert) schwankt stärker: Höchstwert in den 1970ern (9.30), Tiefpunkt in den 2000ern (8.15), Erholung auf 8.88 in den 2010ern. Zwei Annotationen mit Pfeilen: „Peak: New-Hollywood-Ära" und „Tief: Franchise-Dominanz". Der Tooltip zeigt pro Jahrzehnt Dekade, Anzahl Filme, Ø IMDb und Ø RT-Kritiker.
@@ -162,6 +161,7 @@ Unten ein Hinweistext: „Jahrzehnte vor 1960 ausgeblendet: Die wenigen gematcht
 
 #### Tab 5: Popularität – Bekanntheit vs. Bewertungsunterschied
 
+![Tab 4: Zeittrend](screenshots/04_Zeittrend.png)
 ![Tab 5: Popularität](screenshots/05_Popularitaet.png)
 
 Links ein Scatterplot (ggplotly): x-Achse log10(Anzahl IMDb-Votes, Bereich 4.5–6.0), y-Achse Differenz IMDb − RT-Kritiker (Bereich −2 bis +4). Punkte sind nach IMDb-Rating eingefärbt (Farbskala Blau 8.0 bis Rot 9.0). Gestrichelte weisse Nulllinie und weisse Regresslinie – je mehr Votes, desto kleiner die Differenz.
