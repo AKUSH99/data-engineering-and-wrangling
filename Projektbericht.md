@@ -152,6 +152,7 @@ Darunter ein horizontales Balkendiagramm der Ø-Bewertungsdifferenz (IMDb − To
 #### Tab 4: Zeittrend – Bewertungen über die Jahrzehnte
 
 ![Tab 4: Zeittrend](screenshots/04_Zeittrend.png)
+![Tab 8: Datentabelle](screenshots/08_Datentabelle.png)
 
 Ein Liniendiagramm über sechs Jahrzehnte (1960er bis 2010er, y-Achse 6.5–10.5). Die goldene Linie (IMDb, Marker-Grösse 8) bleibt nahezu flach bei ~7.9. Die rote Linie (RT-Kritiker normalisiert) schwankt stärker: Höchstwert in den 1970ern (9.30), Tiefpunkt in den 2000ern (8.15), Erholung auf 8.88 in den 2010ern. Zwei Annotationen mit Pfeilen: „Peak: New-Hollywood-Ära" und „Tief: Franchise-Dominanz". Der Tooltip zeigt pro Jahrzehnt Dekade, Anzahl Filme, Ø IMDb und Ø RT-Kritiker.
 
